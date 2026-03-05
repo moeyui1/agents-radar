@@ -48,6 +48,30 @@ Restart Claude Desktop after saving. You can then ask Claude things like:
 - *"Search for Claude Code mentions this week"* → calls `search`
 - *"Show me the AI trending report for 2026-03-05"* → calls `get_report`
 
+**OpenClaw setup** — run the following command:
+
+```bash
+openclaw mcp add --transport http agents-radar https://agents-radar-mcp.duanyytop.workers.dev
+```
+
+Or add it manually to `~/.openclaw/openclaw.json`:
+
+```json
+{
+  "mcpServers": {
+    "agents-radar": {
+      "type": "http",
+      "url": "https://agents-radar-mcp.duanyytop.workers.dev"
+    }
+  }
+}
+```
+
+You can then ask OpenClaw things like:
+- *"What's the latest in AI CLI tools?"* → calls `get_latest`
+- *"Search for Claude Code mentions this week"* → calls `search`
+- *"Show me the AI trending report for 2026-03-05"* → calls `get_report`
+
 **Self-hosting** — deploy your own instance from the `mcp/` directory:
 
 ```bash

@@ -48,6 +48,30 @@
 - *"搜索本周提到 Claude Code 的报告"* → 调用 `search`
 - *"获取 2026-03-05 的 GitHub 趋势报告"* → 调用 `get_report`
 
+**OpenClaw 接入** — 执行以下命令：
+
+```bash
+openclaw mcp add --transport http agents-radar https://agents-radar-mcp.duanyytop.workers.dev
+```
+
+或手动编辑 `~/.openclaw/openclaw.json`：
+
+```json
+{
+  "mcpServers": {
+    "agents-radar": {
+      "type": "http",
+      "url": "https://agents-radar-mcp.duanyytop.workers.dev"
+    }
+  }
+}
+```
+
+配置完成后即可在 OpenClaw 中直接提问：
+- *"最近 AI CLI 工具有什么动态？"* → 调用 `get_latest`
+- *"搜索本周提到 Claude Code 的报告"* → 调用 `search`
+- *"获取 2026-03-05 的 GitHub 趋势报告"* → 调用 `get_report`
+
 **自托管** — 从 `mcp/` 目录部署自己的实例：
 
 ```bash
