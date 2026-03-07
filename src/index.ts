@@ -2,10 +2,15 @@
  * agents-radar: daily digest for AI CLI tools and OpenClaw.
  *
  * Env vars:
- *   ANTHROPIC_API_KEY   - API key (Anthropic or Kimi Code)
- *   ANTHROPIC_BASE_URL  - Endpoint override (e.g. https://api.kimi.com/coding/)
- *   ANTHROPIC_MODEL     - Model name (default: claude-sonnet-4-6)
- *   GITHUB_TOKEN        - GitHub token for API access and issue creation
+ *   LLM_PROVIDER        - LLM backend: anthropic (default) | openai | github | openrouter
+ *   LLM_MODEL           - Model name override (default per provider: claude-sonnet-4-6 / gpt-4o / openai/gpt-4o)
+ *   ANTHROPIC_API_KEY   - API key for Anthropic or Kimi Code (required when LLM_PROVIDER=anthropic)
+ *   ANTHROPIC_BASE_URL  - Endpoint override for Anthropic (e.g. https://api.kimi.com/coding/)
+ *   ANTHROPIC_MODEL     - Legacy model override for anthropic provider (superseded by LLM_MODEL)
+ *   OPENAI_API_KEY      - API key for OpenAI (required when LLM_PROVIDER=openai)
+ *   OPENAI_BASE_URL     - Endpoint override for OpenAI-compatible APIs
+ *   OPENROUTER_API_KEY  - API key for OpenRouter (required when LLM_PROVIDER=openrouter)
+ *   GITHUB_TOKEN        - GitHub token for API access, issue creation, and GitHub Models (LLM_PROVIDER=github)
  *   DIGEST_REPO         - owner/repo where digest issues are posted (optional)
  */
 
@@ -527,7 +532,14 @@ async function saveHnReport(
 
 async function main(): Promise<void> {
   requireEnv("GITHUB_TOKEN");
-  requireEnv("ANTHROPIC_API_KEY");
+  const provider = process.env["LLM_PROVIDER"] ?? "anthropic";
+  if (provider === "openai") {
+    requireEnv("OPENAI_API_KEY");
+  } else if (provider === "openrouter") {
+    requireEnv("OPENROUTER_API_KEY");
+  } else if (provider !== "github") {
+    requireEnv("ANTHROPIC_API_KEY");
+  }
 
   const now = new Date();
   const since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -535,8 +547,18 @@ async function main(): Promise<void> {
   const utcStr = now.toISOString().slice(0, 16).replace("T", " ");
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
 
+  let endpointLabel: string;
+  if (provider === "openai") {
+    endpointLabel = process.env["OPENAI_BASE_URL"] ?? "api.openai.com";
+  } else if (provider === "github") {
+    endpointLabel = "models.inference.ai.azure.com";
+  } else if (provider === "openrouter") {
+    endpointLabel = "openrouter.ai";
+  } else {
+    endpointLabel = process.env["ANTHROPIC_BASE_URL"] ?? "api.anthropic.com";
+  }
   console.log(
-    `[${now.toISOString()}] Starting digest | endpoint: ${process.env["ANTHROPIC_BASE_URL"] ?? "api.anthropic.com"}`,
+    `[${now.toISOString()}] Starting digest | provider: ${provider} | endpoint: ${endpointLabel}`,
   );
 
   // 1. Fetch all data in parallel

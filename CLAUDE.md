@@ -24,6 +24,14 @@ export ANTHROPIC_BASE_URL=https://api.kimi.com/coding/  # omit for Anthropic
 export DIGEST_REPO=owner/repo   # omit to skip GitHub issue creation
 ```
 
+Set `LLM_PROVIDER` to switch providers: `anthropic` (default), `openai`, `openrouter`, or `github`.
+- `openai`: set `OPENAI_API_KEY`; optionally `OPENAI_BASE_URL` and `LLM_MODEL` (default: `gpt-4o`)
+- `openrouter`: set `OPENROUTER_API_KEY`; optionally `LLM_MODEL` (default: `openai/gpt-4o`)
+- `github`: reuses `GITHUB_TOKEN` with GitHub Models (`models.inference.ai.azure.com`)
+
+Use `LLM_MODEL` to override the default model for any provider.
+`ANTHROPIC_MODEL` is kept as a legacy alias for the `anthropic` provider; `LLM_MODEL` takes priority when both are set.
+
 ## Architecture
 
 The pipeline runs in four sequential phases, each implemented as a named async function in `src/index.ts`:
