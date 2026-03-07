@@ -195,6 +195,7 @@ openclaw_peers:
 | `LLM_MODEL` | 可选 | 模型名称覆盖。默认值：`claude-sonnet-4-6`（anthropic）、`gpt-4o`（openai/github）、`openai/gpt-4o`（openrouter） |
 | `ANTHROPIC_API_KEY` | ✅（anthropic） | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | Anthropic 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
+| `ANTHROPIC_MODEL` | 可选 | `anthropic` 后端的旧版模型名称（建议改用 `LLM_MODEL`） |
 | `OPENAI_API_KEY` | ✅（openai） | OpenAI API 密钥 |
 | `OPENAI_BASE_URL` | 可选 | OpenAI 兼容接口地址覆盖 |
 | `OPENROUTER_API_KEY` | ✅（openrouter） | [OpenRouter](https://openrouter.ai) API 密钥 |

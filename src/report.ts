@@ -9,6 +9,7 @@
  *
  * Model override: LLM_MODEL — overrides the default model for whichever provider is active.
  *   Per-provider defaults: anthropic → claude-sonnet-4-6 | openai/github → gpt-4o | openrouter → openai/gpt-4o
+ *   ANTHROPIC_MODEL is still accepted as a legacy alias (LLM_MODEL takes priority).
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -27,9 +28,11 @@ if (!VALID_PROVIDERS.has(rawProvider)) {
 }
 const LLM_PROVIDER = rawProvider as LlmProvider;
 
-// Default model per provider, overridable via LLM_MODEL
+// Default model per provider, overridable via LLM_MODEL.
+// ANTHROPIC_MODEL is kept as a legacy alias for backward compatibility when
+// LLM_PROVIDER=anthropic and LLM_MODEL is not set.
 const DEFAULT_MODELS: Record<LlmProvider, string> = {
-  anthropic: "claude-sonnet-4-6",
+  anthropic: process.env["ANTHROPIC_MODEL"] ?? "claude-sonnet-4-6",
   openai: "gpt-4o",
   github: "gpt-4o",
   openrouter: "openai/gpt-4o",

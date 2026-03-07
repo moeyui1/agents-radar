@@ -30,6 +30,7 @@ Set `LLM_PROVIDER` to switch providers: `anthropic` (default), `openai`, `openro
 - `github`: reuses `GITHUB_TOKEN` with GitHub Models (`models.inference.ai.azure.com`)
 
 Use `LLM_MODEL` to override the default model for any provider.
+`ANTHROPIC_MODEL` is kept as a legacy alias for the `anthropic` provider; `LLM_MODEL` takes priority when both are set.
 
 ## Architecture
 

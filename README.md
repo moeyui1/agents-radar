@@ -195,6 +195,7 @@ Go to **Settings → Secrets and variables → Actions** and add:
 | `LLM_MODEL` | optional | Model name override. Defaults: `claude-sonnet-4-6` (anthropic), `gpt-4o` (openai/github), `openai/gpt-4o` (openrouter) |
 | `ANTHROPIC_API_KEY` | ✅ (anthropic) | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | Endpoint override for Anthropic. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
+| `ANTHROPIC_MODEL` | optional | Legacy model override for the `anthropic` provider (use `LLM_MODEL` instead) |
 | `OPENAI_API_KEY` | ✅ (openai) | API key for OpenAI |
 | `OPENAI_BASE_URL` | optional | Endpoint override for OpenAI-compatible APIs |
 | `OPENROUTER_API_KEY` | ✅ (openrouter) | API key for [OpenRouter](https://openrouter.ai) |

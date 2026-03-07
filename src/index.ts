@@ -6,6 +6,7 @@
  *   LLM_MODEL           - Model name override (default per provider: claude-sonnet-4-6 / gpt-4o / openai/gpt-4o)
  *   ANTHROPIC_API_KEY   - API key for Anthropic or Kimi Code (required when LLM_PROVIDER=anthropic)
  *   ANTHROPIC_BASE_URL  - Endpoint override for Anthropic (e.g. https://api.kimi.com/coding/)
+ *   ANTHROPIC_MODEL     - Legacy model override for anthropic provider (superseded by LLM_MODEL)
  *   OPENAI_API_KEY      - API key for OpenAI (required when LLM_PROVIDER=openai)
  *   OPENAI_BASE_URL     - Endpoint override for OpenAI-compatible APIs
  *   OPENROUTER_API_KEY  - API key for OpenRouter (required when LLM_PROVIDER=openrouter)
