@@ -5,6 +5,7 @@
  *   anthropic  (default) — Anthropic Claude or Kimi Code via ANTHROPIC_API_KEY + optional ANTHROPIC_BASE_URL
  *   openai               — OpenAI or any OpenAI-compatible endpoint via OPENAI_API_KEY + optional OPENAI_BASE_URL
  *   github               — GitHub Models (Copilot) via GITHUB_TOKEN at models.inference.ai.azure.com
+ *   openrouter           — OpenRouter via OPENROUTER_API_KEY at openrouter.ai/api/v1
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -12,13 +13,13 @@ import OpenAI from "openai";
 import fs from "node:fs";
 import path from "node:path";
 
-type LlmProvider = "anthropic" | "openai" | "github";
+type LlmProvider = "anthropic" | "openai" | "github" | "openrouter";
 
-const VALID_PROVIDERS: ReadonlySet<string> = new Set(["anthropic", "openai", "github"]);
+const VALID_PROVIDERS: ReadonlySet<string> = new Set(["anthropic", "openai", "github", "openrouter"]);
 const rawProvider = process.env["LLM_PROVIDER"] ?? "anthropic";
 if (!VALID_PROVIDERS.has(rawProvider)) {
   throw new Error(
-    `Unsupported LLM_PROVIDER "${rawProvider}". Valid values: anthropic, openai, github`,
+    `Unsupported LLM_PROVIDER "${rawProvider}". Valid values: anthropic, openai, github, openrouter`,
   );
 }
 const LLM_PROVIDER = rawProvider as LlmProvider;
@@ -26,6 +27,7 @@ const LLM_PROVIDER = rawProvider as LlmProvider;
 // Default model per provider
 const ANTHROPIC_MODEL = process.env["ANTHROPIC_MODEL"] ?? "claude-sonnet-4-6";
 const OPENAI_MODEL = process.env["OPENAI_MODEL"] ?? "gpt-4o";
+const OPENROUTER_MODEL = process.env["OPENROUTER_MODEL"] ?? "openai/gpt-4o";
 
 // ---------------------------------------------------------------------------
 // Concurrency limiter — prevents rate-limit (429) errors when many LLM calls
@@ -118,6 +120,15 @@ export async function callLlm(prompt: string, maxTokens = 4096): Promise<string>
           OPENAI_MODEL,
           apiKey,
           "https://models.inference.ai.azure.com",
+        );
+      } else if (LLM_PROVIDER === "openrouter") {
+        const apiKey = process.env["OPENROUTER_API_KEY"];
+        result = await callOpenAiCompatible(
+          prompt,
+          maxTokens,
+          OPENROUTER_MODEL,
+          apiKey,
+          "https://openrouter.ai/api/v1",
         );
       } else {
         result = await callAnthropic(prompt, maxTokens);

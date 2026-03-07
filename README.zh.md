@@ -191,13 +191,15 @@ openclaw_peers:
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_PROVIDER` | 可选 | LLM 后端：`anthropic`（默认）、`openai` 或 `github` |
+| `LLM_PROVIDER` | 可选 | LLM 后端：`anthropic`（默认）、`openai`、`github` 或 `openrouter` |
 | `ANTHROPIC_API_KEY` | ✅（anthropic） | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | Anthropic 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
 | `ANTHROPIC_MODEL` | 可选 | Anthropic 模型名称（默认：`claude-sonnet-4-6`） |
 | `OPENAI_API_KEY` | ✅（openai） | OpenAI API 密钥 |
 | `OPENAI_BASE_URL` | 可选 | OpenAI 兼容接口地址覆盖 |
 | `OPENAI_MODEL` | 可选 | OpenAI 或 GitHub 后端的模型名称（默认：`gpt-4o`） |
+| `OPENROUTER_API_KEY` | ✅（openrouter） | [OpenRouter](https://openrouter.ai) API 密钥 |
+| `OPENROUTER_MODEL` | 可选 | OpenRouter 模型名称（默认：`openai/gpt-4o`） |
 | `TELEGRAM_BOT_TOKEN` | 可选 | Telegram bot token，从 [@BotFather](https://t.me/BotFather) 获取。设置后每次 digest 完成自动推送通知 |
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 
@@ -236,6 +238,11 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # — 或 OpenAI —
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
+
+# — 或 OpenRouter —
+# export LLM_PROVIDER=openrouter
+# export OPENROUTER_API_KEY=sk-or-xxxxxxxx
+# export OPENROUTER_MODEL=openai/gpt-4o  # 可选
 
 # — 或 GitHub Models（Copilot）— 无需额外密钥，复用 GITHUB_TOKEN
 # export LLM_PROVIDER=github

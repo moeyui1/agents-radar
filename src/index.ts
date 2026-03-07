@@ -2,13 +2,15 @@
  * agents-radar: daily digest for AI CLI tools and OpenClaw.
  *
  * Env vars:
- *   LLM_PROVIDER        - LLM backend: anthropic (default) | openai | github
+ *   LLM_PROVIDER        - LLM backend: anthropic (default) | openai | github | openrouter
  *   ANTHROPIC_API_KEY   - API key for Anthropic or Kimi Code (required when LLM_PROVIDER=anthropic)
  *   ANTHROPIC_BASE_URL  - Endpoint override for Anthropic (e.g. https://api.kimi.com/coding/)
  *   ANTHROPIC_MODEL     - Anthropic model name (default: claude-sonnet-4-6)
  *   OPENAI_API_KEY      - API key for OpenAI (required when LLM_PROVIDER=openai)
  *   OPENAI_BASE_URL     - Endpoint override for OpenAI-compatible APIs
  *   OPENAI_MODEL        - Model name for OpenAI or GitHub provider (default: gpt-4o)
+ *   OPENROUTER_API_KEY  - API key for OpenRouter (required when LLM_PROVIDER=openrouter)
+ *   OPENROUTER_MODEL    - Model name for OpenRouter (default: openai/gpt-4o)
  *   GITHUB_TOKEN        - GitHub token for API access, issue creation, and GitHub Models (LLM_PROVIDER=github)
  *   DIGEST_REPO         - owner/repo where digest issues are posted (optional)
  */
@@ -534,6 +536,8 @@ async function main(): Promise<void> {
   const provider = process.env["LLM_PROVIDER"] ?? "anthropic";
   if (provider === "openai") {
     requireEnv("OPENAI_API_KEY");
+  } else if (provider === "openrouter") {
+    requireEnv("OPENROUTER_API_KEY");
   } else if (provider !== "github") {
     requireEnv("ANTHROPIC_API_KEY");
   }
@@ -549,6 +553,8 @@ async function main(): Promise<void> {
     endpointLabel = process.env["OPENAI_BASE_URL"] ?? "api.openai.com";
   } else if (provider === "github") {
     endpointLabel = "models.inference.ai.azure.com";
+  } else if (provider === "openrouter") {
+    endpointLabel = "openrouter.ai";
   } else {
     endpointLabel = process.env["ANTHROPIC_BASE_URL"] ?? "api.anthropic.com";
   }
