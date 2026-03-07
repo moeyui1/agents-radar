@@ -3,14 +3,12 @@
  *
  * Env vars:
  *   LLM_PROVIDER        - LLM backend: anthropic (default) | openai | github | openrouter
+ *   LLM_MODEL           - Model name override (default per provider: claude-sonnet-4-6 / gpt-4o / openai/gpt-4o)
  *   ANTHROPIC_API_KEY   - API key for Anthropic or Kimi Code (required when LLM_PROVIDER=anthropic)
  *   ANTHROPIC_BASE_URL  - Endpoint override for Anthropic (e.g. https://api.kimi.com/coding/)
- *   ANTHROPIC_MODEL     - Anthropic model name (default: claude-sonnet-4-6)
  *   OPENAI_API_KEY      - API key for OpenAI (required when LLM_PROVIDER=openai)
  *   OPENAI_BASE_URL     - Endpoint override for OpenAI-compatible APIs
- *   OPENAI_MODEL        - Model name for OpenAI or GitHub provider (default: gpt-4o)
  *   OPENROUTER_API_KEY  - API key for OpenRouter (required when LLM_PROVIDER=openrouter)
- *   OPENROUTER_MODEL    - Model name for OpenRouter (default: openai/gpt-4o)
  *   GITHUB_TOKEN        - GitHub token for API access, issue creation, and GitHub Models (LLM_PROVIDER=github)
  *   DIGEST_REPO         - owner/repo where digest issues are posted (optional)
  */

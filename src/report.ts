@@ -6,6 +6,9 @@
  *   openai               — OpenAI or any OpenAI-compatible endpoint via OPENAI_API_KEY + optional OPENAI_BASE_URL
  *   github               — GitHub Models (Copilot) via GITHUB_TOKEN at models.inference.ai.azure.com
  *   openrouter           — OpenRouter via OPENROUTER_API_KEY at openrouter.ai/api/v1
+ *
+ * Model override: LLM_MODEL — overrides the default model for whichever provider is active.
+ *   Per-provider defaults: anthropic → claude-sonnet-4-6 | openai/github → gpt-4o | openrouter → openai/gpt-4o
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -24,10 +27,14 @@ if (!VALID_PROVIDERS.has(rawProvider)) {
 }
 const LLM_PROVIDER = rawProvider as LlmProvider;
 
-// Default model per provider
-const ANTHROPIC_MODEL = process.env["ANTHROPIC_MODEL"] ?? "claude-sonnet-4-6";
-const OPENAI_MODEL = process.env["OPENAI_MODEL"] ?? "gpt-4o";
-const OPENROUTER_MODEL = process.env["OPENROUTER_MODEL"] ?? "openai/gpt-4o";
+// Default model per provider, overridable via LLM_MODEL
+const DEFAULT_MODELS: Record<LlmProvider, string> = {
+  anthropic: "claude-sonnet-4-6",
+  openai: "gpt-4o",
+  github: "gpt-4o",
+  openrouter: "openai/gpt-4o",
+};
+const LLM_MODEL = process.env["LLM_MODEL"] ?? DEFAULT_MODELS[LLM_PROVIDER];
 
 // ---------------------------------------------------------------------------
 // Concurrency limiter — prevents rate-limit (429) errors when many LLM calls
@@ -75,7 +82,7 @@ async function callAnthropic(prompt: string, maxTokens: number): Promise<string>
   // Reads ANTHROPIC_API_KEY and ANTHROPIC_BASE_URL from env automatically
   const client = new Anthropic();
   const message = await client.messages.create({
-    model: ANTHROPIC_MODEL,
+    model: LLM_MODEL,
     max_tokens: maxTokens,
     messages: [{ role: "user", content: prompt }],
   });
@@ -111,13 +118,13 @@ export async function callLlm(prompt: string, maxTokens = 4096): Promise<string>
       if (LLM_PROVIDER === "openai") {
         const apiKey = process.env["OPENAI_API_KEY"];
         const baseURL = process.env["OPENAI_BASE_URL"];
-        result = await callOpenAiCompatible(prompt, maxTokens, OPENAI_MODEL, apiKey, baseURL);
+        result = await callOpenAiCompatible(prompt, maxTokens, LLM_MODEL, apiKey, baseURL);
       } else if (LLM_PROVIDER === "github") {
         const apiKey = process.env["GITHUB_TOKEN"];
         result = await callOpenAiCompatible(
           prompt,
           maxTokens,
-          OPENAI_MODEL,
+          LLM_MODEL,
           apiKey,
           "https://models.inference.ai.azure.com",
         );
@@ -126,7 +133,7 @@ export async function callLlm(prompt: string, maxTokens = 4096): Promise<string>
         result = await callOpenAiCompatible(
           prompt,
           maxTokens,
-          OPENROUTER_MODEL,
+          LLM_MODEL,
           apiKey,
           "https://openrouter.ai/api/v1",
         );

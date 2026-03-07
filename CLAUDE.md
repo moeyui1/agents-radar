@@ -25,9 +25,11 @@ export DIGEST_REPO=owner/repo   # omit to skip GitHub issue creation
 ```
 
 Set `LLM_PROVIDER` to switch providers: `anthropic` (default), `openai`, `openrouter`, or `github`.
-- `openai`: set `OPENAI_API_KEY`; optionally `OPENAI_BASE_URL` and `OPENAI_MODEL` (default: `gpt-4o`)
-- `openrouter`: set `OPENROUTER_API_KEY`; optionally `OPENROUTER_MODEL` (default: `openai/gpt-4o`)
+- `openai`: set `OPENAI_API_KEY`; optionally `OPENAI_BASE_URL` and `LLM_MODEL` (default: `gpt-4o`)
+- `openrouter`: set `OPENROUTER_API_KEY`; optionally `LLM_MODEL` (default: `openai/gpt-4o`)
 - `github`: reuses `GITHUB_TOKEN` with GitHub Models (`models.inference.ai.azure.com`)
+
+Use `LLM_MODEL` to override the default model for any provider.
 
 ## Architecture
 

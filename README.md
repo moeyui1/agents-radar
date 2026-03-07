@@ -192,14 +192,12 @@ Go to **Settings → Secrets and variables → Actions** and add:
 | Secret | Required | Description |
 |--------|----------|-------------|
 | `LLM_PROVIDER` | optional | LLM backend: `anthropic` (default), `openai`, `github`, or `openrouter` |
+| `LLM_MODEL` | optional | Model name override. Defaults: `claude-sonnet-4-6` (anthropic), `gpt-4o` (openai/github), `openai/gpt-4o` (openrouter) |
 | `ANTHROPIC_API_KEY` | ✅ (anthropic) | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | Endpoint override for Anthropic. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
-| `ANTHROPIC_MODEL` | optional | Anthropic model name (default: `claude-sonnet-4-6`) |
 | `OPENAI_API_KEY` | ✅ (openai) | API key for OpenAI |
 | `OPENAI_BASE_URL` | optional | Endpoint override for OpenAI-compatible APIs |
-| `OPENAI_MODEL` | optional | Model name for OpenAI or GitHub provider (default: `gpt-4o`) |
 | `OPENROUTER_API_KEY` | ✅ (openrouter) | API key for [OpenRouter](https://openrouter.ai) |
-| `OPENROUTER_MODEL` | optional | Model name for OpenRouter (default: `openai/gpt-4o`) |
 | `TELEGRAM_BOT_TOKEN` | optional | Telegram bot token from [@BotFather](https://t.me/BotFather). If set, a message is sent after each digest run |
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 
@@ -242,7 +240,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # — or OpenRouter —
 # export LLM_PROVIDER=openrouter
 # export OPENROUTER_API_KEY=sk-or-xxxxxxxx
-# export OPENROUTER_MODEL=openai/gpt-4o  # optional
+# export LLM_MODEL=openai/gpt-4o  # optional
 
 # — or GitHub Models (Copilot) — no extra key needed, GITHUB_TOKEN is reused
 # export LLM_PROVIDER=github
