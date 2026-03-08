@@ -253,7 +253,29 @@ export DIGEST_REPO=your-username/agents-radar  # optional; omit to only write fi
 pnpm start
 ```
 
-## Output format
+## Smoke test
+
+Run a quick end-to-end check without creating GitHub Issues or committing files:
+
+```bash
+# Set any one provider (Anthropic shown)
+export GITHUB_TOKEN=ghp_xxxxx
+export ANTHROPIC_API_KEY=sk-ant-xxxxx
+
+# Leave DIGEST_REPO unset so no issues are created
+unset DIGEST_REPO
+
+pnpm start
+```
+
+What to verify:
+
+- No errors in the console output.
+- Five Markdown files appear under `digests/YYYY-MM-DD/` (`ai-cli.md`, `ai-agents.md`, `ai-web.md`, `ai-trending.md`, `ai-hn.md`).
+- Each file contains Chinese-language content with at least one section header.
+- `digests/web-state.json` is updated with the latest seen URLs.
+
+> **Tip:** Set `LLM_CONCURRENCY=1` and `LLM_RETRY_BASE_MS=0` to speed up the test run when using a provider with generous rate limits.
 
 Files are written to `digests/YYYY-MM-DD/`:
 

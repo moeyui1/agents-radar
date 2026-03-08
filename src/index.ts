@@ -533,13 +533,13 @@ async function saveHnReport(
 async function main(): Promise<void> {
   requireEnv("GITHUB_TOKEN");
   const provider = process.env["LLM_PROVIDER"] ?? "anthropic";
-  if (provider === "openai") {
-    requireEnv("OPENAI_API_KEY");
-  } else if (provider === "openrouter") {
-    requireEnv("OPENROUTER_API_KEY");
-  } else if (provider !== "github") {
-    requireEnv("ANTHROPIC_API_KEY");
-  }
+  const providerApiKey: Partial<Record<string, string>> = {
+    openai: "OPENAI_API_KEY",
+    openrouter: "OPENROUTER_API_KEY",
+    anthropic: "ANTHROPIC_API_KEY",
+  };
+  const apiKeyVar = providerApiKey[provider];
+  if (apiKeyVar) requireEnv(apiKeyVar);
 
   const now = new Date();
   const since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -547,16 +547,13 @@ async function main(): Promise<void> {
   const utcStr = now.toISOString().slice(0, 16).replace("T", " ");
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
 
-  let endpointLabel: string;
-  if (provider === "openai") {
-    endpointLabel = process.env["OPENAI_BASE_URL"] ?? "api.openai.com";
-  } else if (provider === "github") {
-    endpointLabel = "models.inference.ai.azure.com";
-  } else if (provider === "openrouter") {
-    endpointLabel = "openrouter.ai";
-  } else {
-    endpointLabel = process.env["ANTHROPIC_BASE_URL"] ?? "api.anthropic.com";
-  }
+  const endpointLabels: Record<string, string> = {
+    openai: process.env["OPENAI_BASE_URL"] ?? "api.openai.com",
+    github: "models.inference.ai.azure.com",
+    openrouter: "openrouter.ai",
+    anthropic: process.env["ANTHROPIC_BASE_URL"] ?? "api.anthropic.com",
+  };
+  const endpointLabel = endpointLabels[provider] ?? "api.anthropic.com";
   console.log(
     `[${now.toISOString()}] Starting digest | provider: ${provider} | endpoint: ${endpointLabel}`,
   );

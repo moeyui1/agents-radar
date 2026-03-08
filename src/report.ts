@@ -73,6 +73,9 @@ function releaseSlot(): void {
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = Math.max(1_000, Number(process.env["LLM_RETRY_BASE_MS"]) || 5_000);
 
+const GITHUB_MODELS_BASE_URL = "https://models.inference.ai.azure.com";
+const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+
 function is429(err: unknown): boolean {
   return (err as { status?: number })?.status === 429 || String(err).includes("429");
 }
@@ -118,30 +121,25 @@ export async function callLlm(prompt: string, maxTokens = 4096): Promise<string>
     let released = false;
     try {
       let result: string;
-      if (LLM_PROVIDER === "openai") {
-        const apiKey = process.env["OPENAI_API_KEY"];
-        const baseURL = process.env["OPENAI_BASE_URL"];
-        result = await callOpenAiCompatible(prompt, maxTokens, LLM_MODEL, apiKey, baseURL);
-      } else if (LLM_PROVIDER === "github") {
-        const apiKey = process.env["GITHUB_TOKEN"];
-        result = await callOpenAiCompatible(
-          prompt,
-          maxTokens,
-          LLM_MODEL,
-          apiKey,
-          "https://models.inference.ai.azure.com",
-        );
-      } else if (LLM_PROVIDER === "openrouter") {
-        const apiKey = process.env["OPENROUTER_API_KEY"];
-        result = await callOpenAiCompatible(
-          prompt,
-          maxTokens,
-          LLM_MODEL,
-          apiKey,
-          "https://openrouter.ai/api/v1",
-        );
-      } else {
-        result = await callAnthropic(prompt, maxTokens);
+      switch (LLM_PROVIDER) {
+        case "openai": {
+          const apiKey = process.env["OPENAI_API_KEY"];
+          const baseURL = process.env["OPENAI_BASE_URL"];
+          result = await callOpenAiCompatible(prompt, maxTokens, LLM_MODEL, apiKey, baseURL);
+          break;
+        }
+        case "github": {
+          const apiKey = process.env["GITHUB_TOKEN"];
+          result = await callOpenAiCompatible(prompt, maxTokens, LLM_MODEL, apiKey, GITHUB_MODELS_BASE_URL);
+          break;
+        }
+        case "openrouter": {
+          const apiKey = process.env["OPENROUTER_API_KEY"];
+          result = await callOpenAiCompatible(prompt, maxTokens, LLM_MODEL, apiKey, OPENROUTER_BASE_URL);
+          break;
+        }
+        default:
+          result = await callAnthropic(prompt, maxTokens);
       }
       return result;
     } catch (err) {
