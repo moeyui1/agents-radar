@@ -5,11 +5,13 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "start": "tsx src/index.ts",
+    "smoke": "tsx src/smoke.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
+    "test": "tsx --test",
     "manifest": "tsx src/generate-manifest.ts",
     "weekly": "tsx src/weekly.ts",
     "monthly": "tsx src/monthly.ts",
