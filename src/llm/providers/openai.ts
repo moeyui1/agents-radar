@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import type { Provider } from "./types.ts";
+import { addTokenUsage } from "../usage.ts";
 
 const DEFAULT_MODEL = "gpt-4o";
 
@@ -18,6 +19,13 @@ export const provider: Provider = {
       max_tokens: maxTokens,
       messages: [{ role: "user", content: prompt }],
     });
+    if (completion.usage) {
+      addTokenUsage({
+        promptTokens: completion.usage.prompt_tokens,
+        completionTokens: completion.usage.completion_tokens,
+        totalTokens: completion.usage.total_tokens,
+      });
+    }
     const text = completion.choices[0]?.message?.content;
     if (!text) throw new Error("Unexpected response type from LLM");
     return text;

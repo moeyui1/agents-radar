@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { addTokenUsage, getTokenUsage, resetTokenUsage } from "../llm/usage.ts";
 
 type EnvSnapshot = Record<string, string | undefined>;
 
@@ -166,4 +167,41 @@ test("invalid provider throws on import", async () => {
   } finally {
     restoreEnv(env);
   }
+});
+
+test("addTokenUsage accumulates values", () => {
+  resetTokenUsage();
+  addTokenUsage({ promptTokens: 100, completionTokens: 50, totalTokens: 150 });
+  addTokenUsage({ promptTokens: 200, completionTokens: 75, totalTokens: 275 });
+  const usage = getTokenUsage();
+  assert.equal(usage.promptTokens, 300);
+  assert.equal(usage.completionTokens, 125);
+  assert.equal(usage.totalTokens, 425);
+});
+
+test("getTokenUsage returns a snapshot (not a live reference)", () => {
+  resetTokenUsage();
+  addTokenUsage({ promptTokens: 10, completionTokens: 5, totalTokens: 15 });
+  const snapshot = getTokenUsage();
+  addTokenUsage({ promptTokens: 10, completionTokens: 5, totalTokens: 15 });
+  assert.equal(snapshot.promptTokens, 10);
+  assert.equal(getTokenUsage().promptTokens, 20);
+});
+
+test("resetTokenUsage clears accumulated values", () => {
+  addTokenUsage({ promptTokens: 500, completionTokens: 200, totalTokens: 700 });
+  resetTokenUsage();
+  const usage = getTokenUsage();
+  assert.equal(usage.promptTokens, 0);
+  assert.equal(usage.completionTokens, 0);
+  assert.equal(usage.totalTokens, 0);
+});
+
+test("addTokenUsage treats missing fields as zero", () => {
+  resetTokenUsage();
+  addTokenUsage({ promptTokens: 100 });
+  const usage = getTokenUsage();
+  assert.equal(usage.promptTokens, 100);
+  assert.equal(usage.completionTokens, 0);
+  assert.equal(usage.totalTokens, 0);
 });

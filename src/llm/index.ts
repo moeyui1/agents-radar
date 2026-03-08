@@ -108,3 +108,5 @@ export const callLlm = createCallLlm();
 
 export { endpointLabel, LLM_PROVIDER, validateProviderConfig } from "./providers.ts";
 export type { LlmProvider } from "./providers.ts";
+export { getTokenUsage, resetTokenUsage } from "./usage.ts";
+export type { TokenUsage } from "./usage.ts";

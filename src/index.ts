@@ -34,7 +34,7 @@ import {
   buildTrendingPrompt,
   buildHnPrompt,
 } from "./prompts.ts";
-import { callLlm, validateProviderConfig, endpointLabel } from "./llm/index.ts";
+import { callLlm, validateProviderConfig, endpointLabel, getTokenUsage } from "./llm/index.ts";
 import { saveFile, autoGenFooter } from "./report.ts";
 import { loadWebState, saveWebState, fetchSiteContent, type WebFetchResult, type WebState } from "./web.ts";
 import { fetchTrendingData, type TrendingData } from "./trending.ts";
@@ -658,6 +658,11 @@ async function main(): Promise<void> {
   }
 
   console.log("Done!");
+
+  const usage = getTokenUsage();
+  console.log(
+    `[token usage] prompt: ${usage.promptTokens} | completion: ${usage.completionTokens} | total: ${usage.totalTokens}`,
+  );
 }
 
 main().catch((err) => {

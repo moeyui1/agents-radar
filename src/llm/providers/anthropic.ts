@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Provider } from "./types.ts";
+import { addTokenUsage } from "../usage.ts";
 
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
@@ -14,6 +15,11 @@ export const provider: Provider = {
       model: resolveModel(),
       max_tokens: maxTokens,
       messages: [{ role: "user", content: prompt }],
+    });
+    addTokenUsage({
+      promptTokens: message.usage.input_tokens,
+      completionTokens: message.usage.output_tokens,
+      totalTokens: message.usage.input_tokens + message.usage.output_tokens,
     });
     const block = message.content[0];
     if (block?.type !== "text") throw new Error("Unexpected response type from LLM");
