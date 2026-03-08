@@ -191,18 +191,20 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `LLM_PROVIDER` | optional | LLM backend: `anthropic` (default), `openai`, `github`, or `openrouter` |
-| `LLM_MODEL` | optional | Model name override. Defaults: `claude-sonnet-4-6` (anthropic), `gpt-4o` (openai/github), `openai/gpt-4o` (openrouter) |
 | `ANTHROPIC_API_KEY` | ✅ (anthropic) | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | Endpoint override for Anthropic. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
 | `ANTHROPIC_MODEL` | optional | Legacy model override for the `anthropic` provider (use `LLM_MODEL` instead) |
+| `LLM_PROVIDER` | optional | LLM backend: `anthropic` (default), `openai`, `github-copilot`, or `openrouter` |
+| `LLM_MODEL` | optional | Model name override. Defaults: `claude-sonnet-4-6` (anthropic), `gpt-4o` (openai/github), `openai/gpt-4o` (openrouter) |
 | `OPENAI_API_KEY` | ✅ (openai) | API key for OpenAI |
 | `OPENAI_BASE_URL` | optional | Endpoint override for OpenAI-compatible APIs |
 | `OPENROUTER_API_KEY` | ✅ (openrouter) | API key for [OpenRouter](https://openrouter.ai) |
 | `TELEGRAM_BOT_TOKEN` | optional | Telegram bot token from [@BotFather](https://t.me/BotFather). If set, a message is sent after each digest run |
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 
-> `GITHUB_TOKEN` is provided automatically by GitHub Actions. When `LLM_PROVIDER=github`, it is also used to authenticate with [GitHub Models](https://github.com/marketplace/models).
+> `GITHUB_TOKEN` is provided automatically by GitHub Actions. When `LLM_PROVIDER=github-copilot`, it is also used to authenticate with [GitHub Models](https://github.com/marketplace/models).
+
+> **GitHub Models rate limits**: GitHub Copilot enforces stricter rate limits than other providers. The default retry intervals (5s / 10s / 20s) and concurrency (5) may not be enough. Set `LLM_RETRY_BASE_MS=15000` (→ 15s / 30s / 60s) and `LLM_CONCURRENCY=2` to reduce 429 errors.
 
 **Setting up Telegram notifications** (optional):
 1. Message [@BotFather](https://t.me/BotFather) on Telegram, create a bot, and copy the token
@@ -244,14 +246,36 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # export LLM_MODEL=openai/gpt-4o  # optional
 
 # — or GitHub Models (Copilot) — no extra key needed, GITHUB_TOKEN is reused
-# export LLM_PROVIDER=github
+# export LLM_PROVIDER=github-copilot
 
 export DIGEST_REPO=your-username/agents-radar  # optional; omit to only write files
 
 pnpm start
 ```
 
-## Output format
+## Smoke test
+
+Run a quick end-to-end check without creating GitHub Issues or committing files:
+
+```bash
+# Set any one provider (Anthropic shown)
+export GITHUB_TOKEN=ghp_xxxxx
+export ANTHROPIC_API_KEY=sk-ant-xxxxx
+
+# Leave DIGEST_REPO unset so no issues are created
+unset DIGEST_REPO
+
+pnpm smoke
+```
+
+What to verify:
+
+- No errors in the console output.
+- Five Markdown files appear under `digests/YYYY-MM-DD/` (`ai-cli.md`, `ai-agents.md`, `ai-web.md`, `ai-trending.md`, `ai-hn.md`).
+- Each file contains Chinese-language content with at least one section header.
+- `digests/web-state.json` is updated with the latest seen URLs.
+
+> **Tip:** Set `LLM_CONCURRENCY=1` and `LLM_RETRY_BASE_MS=0` to speed up the test run when using a provider with generous rate limits.
 
 Files are written to `digests/YYYY-MM-DD/`:
 

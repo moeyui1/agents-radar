@@ -191,18 +191,20 @@ openclaw_peers:
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_PROVIDER` | 可选 | LLM 后端：`anthropic`（默认）、`openai`、`github` 或 `openrouter` |
-| `LLM_MODEL` | 可选 | 模型名称覆盖。默认值：`claude-sonnet-4-6`（anthropic）、`gpt-4o`（openai/github）、`openai/gpt-4o`（openrouter） |
 | `ANTHROPIC_API_KEY` | ✅（anthropic） | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | Anthropic 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
 | `ANTHROPIC_MODEL` | 可选 | `anthropic` 后端的旧版模型名称（建议改用 `LLM_MODEL`） |
+| `LLM_PROVIDER` | 可选 | LLM 后端：`anthropic`（默认）、`openai`、`github-copilot` 或 `openrouter` |
+| `LLM_MODEL` | 可选 | 模型名称覆盖。默认值：`claude-sonnet-4-6`（anthropic）、`gpt-4o`（openai/github）、`openai/gpt-4o`（openrouter） |
 | `OPENAI_API_KEY` | ✅（openai） | OpenAI API 密钥 |
 | `OPENAI_BASE_URL` | 可选 | OpenAI 兼容接口地址覆盖 |
 | `OPENROUTER_API_KEY` | ✅（openrouter） | [OpenRouter](https://openrouter.ai) API 密钥 |
 | `TELEGRAM_BOT_TOKEN` | 可选 | Telegram bot token，从 [@BotFather](https://t.me/BotFather) 获取。设置后每次 digest 完成自动推送通知 |
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 
-> `GITHUB_TOKEN` 由 GitHub Actions 自动提供，无需手动添加。设置 `LLM_PROVIDER=github` 时，该 token 同时用于访问 [GitHub Models](https://github.com/marketplace/models)（GitHub Copilot）。
+> `GITHUB_TOKEN` 由 GitHub Actions 自动提供，无需手动添加。设置 `LLM_PROVIDER=github-copilot` 时，该 token 同时用于访问 [GitHub Models](https://github.com/marketplace/models)（GitHub Copilot）。
+
+> **GitHub Models 速率限制**：GitHub Copilot 的速率限制比其他 Provider 更严格，默认的重试间隔（5s / 10s / 20s）和并发数（5）可能不够。建议通过环境变量调整：设置 `LLM_RETRY_BASE_MS=15000`（15s / 30s / 60s）和 `LLM_CONCURRENCY=2` 以降低触发 429 错误的概率。
 
 **配置 Telegram 推送**（可选）：
 1. 向 [@BotFather](https://t.me/BotFather) 创建 bot，复制 token
@@ -244,14 +246,36 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # export LLM_MODEL=openai/gpt-4o  # 可选
 
 # — 或 GitHub Models（Copilot）— 无需额外密钥，复用 GITHUB_TOKEN
-# export LLM_PROVIDER=github
+# export LLM_PROVIDER=github-copilot
 
 export DIGEST_REPO=your-username/agents-radar  # 可选，留空则仅写入本地文件
 
 pnpm start
 ```
 
-## 输出格式
+## 冒烟测试
+
+不创建 GitHub Issue、不提交文件，快速验证端到端流程是否正常：
+
+```bash
+# 配置任意一个 Provider（以 Anthropic 为例）
+export GITHUB_TOKEN=ghp_xxxxx
+export ANTHROPIC_API_KEY=sk-ant-xxxxx
+
+# 不设置 DIGEST_REPO，这样不会创建 Issue
+unset DIGEST_REPO
+
+pnpm smoke
+```
+
+验证要点：
+
+- 控制台没有报错。
+- `digests/YYYY-MM-DD/` 目录下生成五个 Markdown 文件：`ai-cli.md`、`ai-agents.md`、`ai-web.md`、`ai-trending.md`、`ai-hn.md`。
+- 每个文件包含至少一个中文章节标题。
+- `digests/web-state.json` 已更新为最新抓取的 URL 列表。
+
+> **提示：** 使用限速宽松的 Provider 时，可设置 `LLM_CONCURRENCY=1`、`LLM_RETRY_BASE_MS=0` 加快测试速度。
 
 文件写入 `digests/YYYY-MM-DD/`：
 
