@@ -255,27 +255,22 @@ pnpm start
 
 ## 冒烟测试
 
-不创建 GitHub Issue、不提交文件，快速验证端到端流程是否正常：
+`pnpm smoke` 执行最小化单报告验证（`src/smoke.ts`）：只抓取第一个 CLI 仓库，调用一次 LLM，生成一个 `ai-cli.md` 文件。不创建 GitHub Issue、不运行横向对比，整体耗时极短。
 
 ```bash
 # 配置任意一个 Provider（以 Anthropic 为例）
 export GITHUB_TOKEN=ghp_xxxxx
 export ANTHROPIC_API_KEY=sk-ant-xxxxx
 
-# 不设置 DIGEST_REPO，这样不会创建 Issue
-unset DIGEST_REPO
-
-pnpm start
+pnpm smoke
 ```
 
 验证要点：
 
 - 控制台没有报错。
-- `digests/YYYY-MM-DD/` 目录下生成五个 Markdown 文件：`ai-cli.md`、`ai-agents.md`、`ai-web.md`、`ai-trending.md`、`ai-hn.md`。
-- 每个文件包含至少一个中文章节标题。
-- `digests/web-state.json` 已更新为最新抓取的 URL 列表。
+- `digests/YYYY-MM-DD/ai-cli.md` 已生成，包含至少一个中文章节标题。
 
-> **提示：** 使用限速宽松的 Provider 时，可设置 `LLM_CONCURRENCY=1`、`LLM_RETRY_BASE_MS=0` 加快测试速度。
+> **提示：** 使用限速宽松的 Provider 时，可设置 `LLM_CONCURRENCY=1`、`LLM_RETRY_BASE_MS=0` 加快冒烟速度。
 
 文件写入 `digests/YYYY-MM-DD/`：
 

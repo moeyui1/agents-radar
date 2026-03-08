@@ -255,27 +255,22 @@ pnpm start
 
 ## Smoke test
 
-Run a quick end-to-end check without creating GitHub Issues or committing files:
+`pnpm smoke` runs a minimal single-report check (`src/smoke.ts`): it fetches only the first CLI repo, makes one LLM call, and writes a single `ai-cli.md` file. No GitHub Issues are created and no comparisons are run, so it finishes quickly.
 
 ```bash
 # Set any one provider (Anthropic shown)
 export GITHUB_TOKEN=ghp_xxxxx
 export ANTHROPIC_API_KEY=sk-ant-xxxxx
 
-# Leave DIGEST_REPO unset so no issues are created
-unset DIGEST_REPO
-
-pnpm start
+pnpm smoke
 ```
 
 What to verify:
 
 - No errors in the console output.
-- Five Markdown files appear under `digests/YYYY-MM-DD/` (`ai-cli.md`, `ai-agents.md`, `ai-web.md`, `ai-trending.md`, `ai-hn.md`).
-- Each file contains Chinese-language content with at least one section header.
-- `digests/web-state.json` is updated with the latest seen URLs.
+- `digests/YYYY-MM-DD/ai-cli.md` is created with Chinese-language content and at least one section header.
 
-> **Tip:** Set `LLM_CONCURRENCY=1` and `LLM_RETRY_BASE_MS=0` to speed up the test run when using a provider with generous rate limits.
+> **Tip:** Set `LLM_CONCURRENCY=1` and `LLM_RETRY_BASE_MS=0` to speed up the smoke run when using a provider with generous rate limits.
 
 Files are written to `digests/YYYY-MM-DD/`:
 
