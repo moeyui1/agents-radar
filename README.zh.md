@@ -204,6 +204,8 @@ openclaw_peers:
 
 > `GITHUB_TOKEN` 由 GitHub Actions 自动提供，无需手动添加。设置 `LLM_PROVIDER=github` 时，该 token 同时用于访问 [GitHub Models](https://github.com/marketplace/models)（GitHub Copilot）。
 
+> **GitHub Models 速率限制**：GitHub Copilot 的速率限制比其他 Provider 更严格，默认的重试间隔（5s / 10s / 20s）和并发数（5）可能不够。建议通过环境变量调整：设置 `LLM_RETRY_BASE_MS=15000`（15s / 30s / 60s）和 `LLM_CONCURRENCY=2` 以降低触发 429 错误的概率。
+
 **配置 Telegram 推送**（可选）：
 1. 向 [@BotFather](https://t.me/BotFather) 创建 bot，复制 token
 2. 将 bot 加入频道 / 群组，或直接与 bot 私聊

@@ -204,6 +204,8 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 > `GITHUB_TOKEN` is provided automatically by GitHub Actions. When `LLM_PROVIDER=github`, it is also used to authenticate with [GitHub Models](https://github.com/marketplace/models).
 
+> **GitHub Models rate limits**: GitHub Copilot enforces stricter rate limits than other providers. The default retry intervals (5s / 10s / 20s) and concurrency (5) may not be enough. Set `LLM_RETRY_BASE_MS=15000` (→ 15s / 30s / 60s) and `LLM_CONCURRENCY=2` to reduce 429 errors.
+
 **Setting up Telegram notifications** (optional):
 1. Message [@BotFather](https://t.me/BotFather) on Telegram, create a bot, and copy the token
 2. Add the bot to your channel/group, or start a DM with it

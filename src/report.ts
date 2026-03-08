@@ -45,7 +45,7 @@ const LLM_MODEL = process.env["LLM_MODEL"] ?? DEFAULT_MODELS[LLM_PROVIDER];
 // any given time; the rest queue and run as slots free up.
 // ---------------------------------------------------------------------------
 
-const LLM_CONCURRENCY = 5;
+const LLM_CONCURRENCY = Math.max(1, Number(process.env["LLM_CONCURRENCY"]) || 5);
 let llmSlots = LLM_CONCURRENCY;
 const llmQueue: Array<() => void> = [];
 
@@ -71,7 +71,7 @@ function releaseSlot(): void {
 // ---------------------------------------------------------------------------
 
 const MAX_RETRIES = 3;
-const RETRY_BASE_MS = 5_000; // 5 s, 10 s, 20 s
+const RETRY_BASE_MS = Math.max(1_000, Number(process.env["LLM_RETRY_BASE_MS"]) || 5_000);
 
 function is429(err: unknown): boolean {
   return (err as { status?: number })?.status === 429 || String(err).includes("429");
