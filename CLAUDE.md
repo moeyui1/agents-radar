@@ -24,12 +24,20 @@ export ANTHROPIC_BASE_URL=https://api.kimi.com/coding/  # omit for Anthropic
 export DIGEST_REPO=owner/repo   # omit to skip GitHub issue creation
 ```
 
+Set `LLM_PROVIDER` to switch providers: `anthropic` (default), `openai`, `openrouter`, or `github-copilot`.
+- `openai`: set `OPENAI_API_KEY`; optionally `OPENAI_BASE_URL` and `LLM_MODEL` (default: `gpt-4o`)
+- `openrouter`: set `OPENROUTER_API_KEY`; optionally `LLM_MODEL` (default: `openai/gpt-4o`)
+- `github-copilot`: reuses `GITHUB_TOKEN` with GitHub Models (`models.github.ai`)
+
+Use `LLM_MODEL` to override the default model for any provider.
+`ANTHROPIC_MODEL` is the dedicated model config for the default `anthropic` provider and takes priority over `LLM_MODEL` when both are set.
+
 ## Architecture
 
 The pipeline runs in four sequential phases, each implemented as a named async function in `src/index.ts`:
 
 1. **`fetchAllData`** — all network I/O in parallel: GitHub API (issues/PRs/releases) for 17 repos, Claude Code Skills, Anthropic/OpenAI sitemaps, GitHub Trending HTML + Search API, Hacker News Algolia API.
-2. **`generateSummaries`** — per-repo LLM calls, all in parallel, rate-limited to 5 concurrent requests by a queue in `src/report.ts`.
+2. **`generateSummaries`** — per-repo LLM calls, all in parallel, rate-limited to 5 concurrent requests by a queue in `src/llm/index.ts`.
 3. **Comparisons** — two LLM calls: cross-tool CLI comparison and OpenClaw cross-ecosystem comparison.
 4. **Save phase** — `buildCliReportContent` / `buildOpenclawReportContent` build Markdown strings; `saveWebReport` / `saveTrendingReport` / `saveHnReport` call LLM + write file + create GitHub Issue.
 
@@ -40,7 +48,8 @@ The pipeline runs in four sequential phases, each implemented as a named async f
 | `src/index.ts` | Orchestration: repo config, phase functions, `main()` |
 | `src/github.ts` | GitHub API helpers: `fetchRecentItems`, `fetchRecentReleases`, `fetchSkillsData`, `createGitHubIssue` |
 | `src/prompts.ts` | LLM prompt builders (one per report type) and `formatItem` |
-| `src/report.ts` | `callLlm` (with concurrency limiter), `saveFile`, `autoGenFooter` |
+| `src/llm/index.ts` | LLM provider selection, `callLlm` (with concurrency limiter), validation helpers |
+| `src/report.ts` | `saveFile`, `autoGenFooter` |
 | `src/web.ts` | Sitemap-based web content fetching; state persisted to `digests/web-state.json` |
 | `src/trending.ts` | GitHub Trending HTML scraper + Search API topic queries |
 | `src/hn.ts` | Hacker News top AI stories via Algolia HN Search API |
@@ -71,8 +80,8 @@ Files written to `digests/YYYY-MM-DD/`:
 
 - All LLM prompts are in `src/prompts.ts`. Each report type has its own builder function. Prompts are written in Chinese and produce Chinese output.
 - `callLlm(prompt, maxTokens?)` defaults to 4096 tokens. Web report uses 8192, trending uses 6144. HN report uses the default 4096.
-- On 429 rate-limit errors `callLlm` retries up to 3 times with exponential backoff (5 s / 10 s / 20 s); the concurrency slot is released during the wait.
-- The concurrency limiter (`LLM_CONCURRENCY = 5`) prevents 429s when many parallel LLM calls fire. Do not bypass it by calling the Anthropic SDK directly.
+- On 429 rate-limit errors `callLlm` retries up to 3 times with exponential backoff (base from `LLM_RETRY_BASE_MS`, default 5 000 → 5 s / 10 s / 20 s); the concurrency slot is released during the wait. For GitHub Models set `LLM_RETRY_BASE_MS=15000`.
+- The concurrency limiter (`LLM_CONCURRENCY`, default 5, env-overridable) prevents 429s when many parallel LLM calls fire. For GitHub Models set `LLM_CONCURRENCY=2`. Do not bypass it by calling the Anthropic SDK directly.
 - GitHub issue label colors are defined in `LABEL_COLORS` in `src/github.ts`. Add new labels there.
 - `sampleNote(total, sampled)` in `src/prompts.ts` formats the "(共 N 条，展示前 M 条)" note. Reuse it — do not inline the same string format.
 - Web state (`digests/web-state.json`) is committed to git on every run. It is the source of truth for which URLs have been seen.
