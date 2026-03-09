@@ -42,7 +42,7 @@ function releaseSlot(): void {
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 5_000; // 5 s, 10 s, 20 s
 
-function is429(err: unknown): boolean {
+export function is429(err: unknown): boolean {
   return (err as { status?: number })?.status === 429 || String(err).includes("429");
 }
 

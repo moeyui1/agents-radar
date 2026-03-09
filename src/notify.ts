@@ -11,9 +11,7 @@
 
 import fs from "node:fs";
 
-const BOT_TOKEN = process.env["TELEGRAM_BOT_TOKEN"] ?? "";
-const CHAT_ID = process.env["TELEGRAM_CHAT_ID"] || "@agents_radar";
-const PAGES_URL = (process.env["PAGES_URL"] ?? "https://duanyytop.github.io/agents-radar").replace(/\/$/, "");
+const PAGES_URL_DEFAULT = "https://duanyytop.github.io/agents-radar";
 
 const ZH_LABELS: Record<string, string> = {
   "ai-cli": "AI CLI 工具",
@@ -36,6 +34,8 @@ const EN_LABELS: Record<string, string> = {
 };
 
 async function sendTelegram(text: string): Promise<void> {
+  const BOT_TOKEN = process.env["TELEGRAM_BOT_TOKEN"] ?? "";
+  const CHAT_ID = process.env["TELEGRAM_CHAT_ID"] || "@agents_radar";
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
   const res = await fetch(url, {
     method: "POST",
@@ -53,7 +53,8 @@ async function sendTelegram(text: string): Promise<void> {
   }
 }
 
-function buildMessage(date: string, reports: string[]): string {
+export function buildMessage(date: string, reports: string[], pagesUrl?: string): string {
+  const PAGES_URL = (pagesUrl ?? process.env["PAGES_URL"] ?? PAGES_URL_DEFAULT).replace(/\/$/, "");
   const baseReports = reports.filter((r) => !r.endsWith("-en"));
   const isWeekly = baseReports.includes("ai-weekly");
   const isMonthly = baseReports.includes("ai-monthly");
@@ -86,6 +87,7 @@ function buildMessage(date: string, reports: string[]): string {
 }
 
 async function main(): Promise<void> {
+  const BOT_TOKEN = process.env["TELEGRAM_BOT_TOKEN"] ?? "";
   if (!BOT_TOKEN) {
     console.log("[notify] TELEGRAM_BOT_TOKEN not set — skipping.");
     return;

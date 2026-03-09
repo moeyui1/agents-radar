@@ -73,7 +73,7 @@ const DEFAULT_OPENCLAW_PEERS: RepoConfig[] = [
 // Loader
 // ---------------------------------------------------------------------------
 
-function toRepoConfig(e: RawRepoEntry): RepoConfig {
+export function toRepoConfig(e: RawRepoEntry): RepoConfig {
   return { id: e.id, repo: e.repo, name: e.name, ...(e.paginated ? { paginated: true } : {}) };
 }
 

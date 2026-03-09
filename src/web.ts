@@ -132,7 +132,7 @@ function sleep(ms: number): Promise<void> {
 // Sitemap parsing (plain-text XML; no DOM needed)
 // ---------------------------------------------------------------------------
 
-function parseSitemapUrls(xml: string): Array<{ loc: string; lastmod?: string }> {
+export function parseSitemapUrls(xml: string): Array<{ loc: string; lastmod?: string }> {
   const results: Array<{ loc: string; lastmod?: string }> = [];
   for (const block of xml.match(/<url>[\s\S]*?<\/url>/g) ?? []) {
     const loc = block.match(/<loc>\s*(.*?)\s*<\/loc>/)?.[1];
@@ -142,7 +142,7 @@ function parseSitemapUrls(xml: string): Array<{ loc: string; lastmod?: string }>
   return results;
 }
 
-function isSitemapIndex(xml: string): boolean {
+export function isSitemapIndex(xml: string): boolean {
   return /<sitemapindex[\s>]/.test(xml);
 }
 
@@ -150,7 +150,7 @@ function isSitemapIndex(xml: string): boolean {
 // HTML content extraction
 // ---------------------------------------------------------------------------
 
-function extractTitle(html: string): string {
+export function extractTitle(html: string): string {
   return (
     // Prefer OpenGraph title for cleaner strings
     (
@@ -162,7 +162,7 @@ function extractTitle(html: string): string {
   );
 }
 
-function extractText(html: string): string {
+export function extractText(html: string): string {
   // Prefer <main> or <article> to avoid nav/header/footer boilerplate
   const source =
     html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] ??
@@ -184,7 +184,7 @@ function extractText(html: string): string {
     .slice(0, MAX_CONTENT_LENGTH);
 }
 
-function urlCategory(url: string): string {
+export function urlCategory(url: string): string {
   try {
     return new URL(url).pathname.split("/").filter(Boolean)[0] ?? "article";
   } catch {
@@ -193,7 +193,7 @@ function urlCategory(url: string): string {
 }
 
 /** Derive a human-readable title from the last URL path segment. */
-function titleFromUrl(url: string): string {
+export function titleFromUrl(url: string): string {
   try {
     const slug = new URL(url).pathname.split("/").filter(Boolean).pop() ?? "";
     return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -250,7 +250,7 @@ async function discoverUrls(site: "anthropic" | "openai"): Promise<Array<{ loc: 
 
 const STATE_FILE = path.join("digests", "web-state.json");
 
-function emptyState(): WebState {
+export function emptyState(): WebState {
   return {
     anthropic: { lastChecked: "", seenUrls: {} },
     openai: { lastChecked: "", seenUrls: {} },

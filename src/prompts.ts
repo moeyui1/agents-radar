@@ -55,11 +55,11 @@ const CLI_ISSUE_LIMIT = 30;
 const CLI_PR_LIMIT = 20;
 
 /** Sort by comment count desc, take top N. */
-function topN(items: GitHubItem[], n: number): GitHubItem[] {
+export function topN(items: GitHubItem[], n: number): GitHubItem[] {
   return [...items].sort((a, b) => b.comments - a.comments).slice(0, n);
 }
 
-function sampleNote(total: number, sampled: number, lang: "zh" | "en" = "zh"): string {
+export function sampleNote(total: number, sampled: number, lang: "zh" | "en" = "zh"): string {
   if (lang === "en") {
     return total > sampled
       ? `(Total: ${total} items; showing top ${sampled} by comment count)`
