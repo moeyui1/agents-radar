@@ -2,7 +2,7 @@
  * GitHub Copilot provider — OpenAI-compatible endpoint via GitHub Models.
  *
  * Env vars:
- *   GITHUB_TOKEN           - GitHub personal access token
+ *   GITHUB_TOKEN           - GitHub token (PAT or GitHub Actions `GITHUB_TOKEN`)
  *   GITHUB_COPILOT_MODEL   - model name (default: gpt-4o)
  */
 

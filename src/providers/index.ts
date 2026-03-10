@@ -5,13 +5,13 @@
  *   import { createProvider, type LlmProvider } from "./providers/index.ts";
  */
 
-export type { LlmProvider, ProviderName, ProviderFactory } from "./types.ts";
+export type { LlmProvider, ProviderFactory } from "./types.ts";
 export { AnthropicProvider } from "./anthropic.ts";
 export { OpenAIProvider } from "./openai.ts";
 export { GitHubCopilotProvider } from "./github-copilot.ts";
 export { OpenRouterProvider } from "./openrouter.ts";
 
-import type { LlmProvider, ProviderName, ProviderFactory } from "./types.ts";
+import type { LlmProvider, ProviderFactory } from "./types.ts";
 import { AnthropicProvider } from "./anthropic.ts";
 import { OpenAIProvider } from "./openai.ts";
 import { GitHubCopilotProvider } from "./github-copilot.ts";
@@ -21,12 +21,15 @@ import { OpenRouterProvider } from "./openrouter.ts";
 // Single source of truth — add new providers here only.
 // ---------------------------------------------------------------------------
 
-const PROVIDERS: Record<ProviderName, ProviderFactory> = {
+const PROVIDERS = {
   anthropic: () => new AnthropicProvider(),
   openai: () => new OpenAIProvider(),
   "github-copilot": () => new GitHubCopilotProvider(),
   openrouter: () => new OpenRouterProvider(),
-};
+} satisfies Record<string, ProviderFactory>;
+
+/** Supported provider name — derived from the PROVIDERS registry. */
+export type ProviderName = keyof typeof PROVIDERS;
 
 /** All valid provider names — derived from the registry. */
 export const VALID_PROVIDER_NAMES = Object.keys(PROVIDERS) as ProviderName[];
@@ -43,7 +46,7 @@ export const VALID_PROVIDER_NAMES = Object.keys(PROVIDERS) as ProviderName[];
 export function createProvider(name?: ProviderName): LlmProvider {
   const providerName = name ?? (process.env["LLM_PROVIDER"] as ProviderName | undefined) ?? "anthropic";
 
-  const factory = PROVIDERS[providerName];
+  const factory = (PROVIDERS as Record<string, ProviderFactory | undefined>)[providerName];
   if (!factory) {
     throw new Error(
       `Invalid LLM provider: "${providerName}". ` +

@@ -14,6 +14,3 @@ export interface LlmProvider {
 
 /** Factory function that creates an LlmProvider instance. */
 export type ProviderFactory = () => LlmProvider;
-
-/** Supported provider name — derived from the PROVIDERS registry keys. */
-export type ProviderName = "anthropic" | "openai" | "github-copilot" | "openrouter";
